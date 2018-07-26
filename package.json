@@ -1,19 +1,23 @@
 {
-  "devDependencies": {
-    "eslint": "5.2.0",
-    "eslint-config-prettier": "2.9.0",
-    "eslint-plugin-prettier": "2.6.2",
-    "husky": "^0.14.3",
-    "prettier": "1.13.7"
-  },
-  "name": "podcaster",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.16.3"
-  },
-  "scripts": {
-    "precommit": "yarn eslint --fix ."
-  }
+    "devDependencies": {
+        "babel-preset-env": "^1.7.0",
+        "babel-preset-react": "^6.24.1",
+        "eslint": "5.2.0",
+        "eslint-config-prettier": "2.9.0",
+        "eslint-plugin-prettier": "2.6.2",
+        "husky": "^0.14.3",
+        "prettier": "1.13.7"
+    },
+    "name": "podcaster",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "dependencies": {
+        "body-parser": "^1.18.3",
+        "express": "^4.16.3",
+        "mongodb": "^3.1.1"
+    },
+    "scripts": {
+        "server": "nodemon index.js"
+    }
 }
