@@ -18,26 +18,28 @@ mongoClient.connect(
         }
         console.log('Connected to Mongo');
         let dBase = db.db('crud');
+        let feeds = dBase.collection(feedCollection);
 
-        app.get('/', (req, res) => {
-            dBase
-                .collection(feedCollection)
-                .find()
-                .toArray((err, results) => {
-                    if (err) res.send(err);
-                    else res.send(results);
-                });
+        app.get('/feeds', (req, res) => {
+            feeds.find().toArray((err, results) => {
+                if (err) res.send(err);
+                else res.send(results);
+            });
         });
 
-        app.post('/add', (req, res) => {
+        app.post('/feed', (req, res) => {
             let stuff = {
-                first: req.body.stuff,
-                second: req.body.moreStuff,
+                name: req.body.name,
             };
 
-            dBase.collection(feedCollection).insertOne(stuff, (err, item) => {
+            feeds.insertOne(stuff, (err, item) => {
                 if (err) res.send(err);
-                else res.send(`Added some stuff\n${item.insertedId}`);
+                else {
+                    let newFeed = {
+                        id: item.insertedId,
+                    };
+                    res.send(newFeed);
+                }
             });
         });
 
