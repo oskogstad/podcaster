@@ -3,27 +3,22 @@ const mongoClient = require('mongodb').MongoClient,
     bodyParser = require('body-parser'),
     express = require('express'),
     multer = require('multer'),
-    crypto = require('crypto'),
-    xml2js = require('xml2js'),
+    getPodcast = require('./PodcastGenerator'),
     path = require('path'),
-    fs = require('fs'),
-    config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
-    feedDefaults = JSON.parse(fs.readFileSync('feed_defaults.json', 'utf8')),
-    port = config.port,
-    databaseUri = config.databaseUri,
+    fs = require('fs');
+
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
     app = express(),
-    images = '/images/',
-    imagesUri = path.join(__dirname, images), // eslint-disable-line
-    upload = multer({ dest: imagesUri }),
-    feedsUri = path.join(__dirname, '/feeds/'); // eslint-disable-line
+    imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
+    upload = multer({ dest: imagesUri });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(upload.single('podcast-image'));
-app.use(images, express.static(imagesUri));
+app.use('/images/', express.static(imagesUri));
 
 mongoClient.connect(
-    databaseUri,
+    config.databaseUri,
     { useNewUrlParser: true },
     (err, db) => {
         if (err) console.log(`Failed connecting to mongoDB:\n${err}`);
@@ -50,79 +45,7 @@ mongoClient.connect(
 
         // ADD NEW FEED
         app.post('/api/feed/add', (req, res) => {
-            let podcast = {
-                name: req.body.name,
-                pid: crypto.randomBytes(10).toString('hex')
-            };
-
-            let feedFileName =
-                podcast.pid +
-                '_' +
-                podcast.name
-                    .trim()
-                    .replace(/[^\w\s]/g, '')
-                    .replace(/\s\s+/g, '_') +
-                '.xml';
-
-            fs.readFile(
-                feedsUri + 'feed_template.xml',
-                'utf-8',
-                (err, data) => {
-                    if (err)
-                        console.log(
-                            `Failed reading xml feed template:\n${err}`
-                        );
-
-                    xml2js.parseString(data, (err, result) => {
-                        if (err)
-                            console.log(
-                                `Failed parsing xml feed template:\n${err}`
-                            );
-
-                        let json = result.rss.channel[0];
-
-                        json.link[0] = feedDefaults.link;
-                        json.language[0] = feedDefaults.language;
-                        json.copyright[0] = feedDefaults.copyright;
-                        json.webMaster[0] = feedDefaults.webMaster;
-                        json.managingEditor[0] = feedDefaults.managingEditor;
-                        json.image[0].title[0] = feedDefaults.image.title;
-                        json.image[0].link[0] = feedDefaults.link;
-
-                        json['itunes:owner'][0]['itunes:name'][0] =
-                            feedDefaults['itunes:owner']['itunes:name'];
-                        json['itunes:owner'][0]['itunes:email'][0] =
-                            feedDefaults['itunes:owner']['itunes:email'];
-                        json['itunes:category'][0].$.text =
-                            feedDefaults['itunes:category'];
-                        json['itunes:keywords'][0] =
-                            feedDefaults['itunes:keywords'];
-                        json['itunes:author'][0] =
-                            feedDefaults['itunes:author'];
-
-                        result.rss.channel[0] = json;
-
-                        let builder = new xml2js.Builder();
-                        let xml = builder.buildObject(result);
-
-                        fs.writeFile(feedsUri + feedFileName, xml, err => {
-                            if (err)
-                                console.log(
-                                    `Failed writing new xml file:\n${err}`
-                                );
-                        });
-                    });
-                }
-            );
-
-            fs.rename(
-                `${imagesUri}${req.file.filename}`,
-                `${imagesUri}${podcast.pid}.png`,
-                err => {
-                    if (err)
-                        console.log(`Failed changing image filename:\n${err}`);
-                }
-            );
+            let podcast = getPodcast(req);
 
             feeds.insertOne(podcast, (err, item) => {
                 if (err) res.send(err);
@@ -135,6 +58,8 @@ mongoClient.connect(
             });
         });
 
-        app.listen(port, () => console.log(`Listening at ${port}`));
+        app.listen(config.port, () =>
+            console.log(`Listening at ${config.port}`)
+        );
     }
 );
