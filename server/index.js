@@ -12,7 +12,8 @@ const mongoClient = require('mongodb').MongoClient,
     app = express(),
     images = '/images/',
     imagesUri = path.join(__dirname, images),
-    upload = multer({ dest: imagesUri });
+    upload = multer({ dest: imagesUri }),
+    feedsUri = path.join(__dirname, '/feeds/');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,10 +52,16 @@ mongoClient.connect(
                 name: req.body.name,
                 pid: crypto.randomBytes(10).toString('hex')
             };
+
             let feedFileName =
                 podcast.pid +
-                podcast.name.replace(/[^\w\s!?]/g, '').replace(/\s/g, '_') +
+                '_' +
+                podcast.name.replace(/[^\w\s]/g, '').replace(/\s/g, '_') +
                 '.xml';
+
+            fs.createReadStream(feedsUri + 'feed_template.xml').pipe(
+                fs.createWriteStream(feedsUri + feedFileName)
+            );
 
             fs.rename(
                 `${imagesUri}${req.file.filename}`,
