@@ -23,8 +23,7 @@
             {
                 "singleQuote": true,
                 "tabWidth": 4,
-                "tabs": true,
-                "trailingComma": "all"
+                "tabs": true
             }
         ],
         "eqeqeq": [
