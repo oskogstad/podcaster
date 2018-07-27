@@ -56,7 +56,10 @@ mongoClient.connect(
             let feedFileName =
                 podcast.pid +
                 '_' +
-                podcast.name.replace(/[^\w\s]/g, '').replace(/\s/g, '_') +
+                podcast.name
+                    .trim()
+                    .replace(/[^\w\s]/g, '')
+                    .replace(/\s\s+/g, '_') +
                 '.xml';
 
             fs.createReadStream(feedsUri + 'feed_template.xml').pipe(
