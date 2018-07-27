@@ -10,7 +10,7 @@
     },
     "name": "podcaster",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "server/index.js",
     "license": "MIT",
     "dependencies": {
         "body-parser": "^1.18.3",

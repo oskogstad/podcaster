@@ -47,20 +47,24 @@ mongoClient.connect(
 
         // ADD NEW FEED
         app.post('/api/feed/add', (req, res) => {
-            let stuff = {
+            let podcast = {
                 name: req.body.name,
                 pid: crypto.randomBytes(10).toString('hex')
             };
+            let feedFileName =
+                podcast.pid +
+                podcast.name.replace(/[^\w\s!?]/g, '').replace(/\s/g, '_') +
+                '.xml';
 
             fs.rename(
                 `${imagesUri}${req.file.filename}`,
-                `${imagesUri}${stuff.pid}.png`,
+                `${imagesUri}${podcast.pid}.png`,
                 err => {
                     if (err) console.log(`Failed changing filename:\n${err}`);
                 }
             );
 
-            feeds.insertOne(stuff, (err, item) => {
+            feeds.insertOne(podcast, (err, item) => {
                 if (err) res.send(err);
                 else {
                     let newFeed = {
