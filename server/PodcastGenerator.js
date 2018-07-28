@@ -79,7 +79,7 @@ function RenameImageFile(podcast, currentFileName) {
     );
 }
 
-function GetPodcast(req) {
+function CreatePodcast(req) {
     let pid = crypto.randomBytes(10).toString('hex');
     let now = new Date().toString();
 
@@ -104,4 +104,4 @@ function GetPodcast(req) {
     return podcast;
 }
 
-module.exports = GetPodcast; // eslint-disable-line
+module.exports = CreatePodcast; // eslint-disable-line

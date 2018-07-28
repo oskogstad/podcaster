@@ -3,7 +3,7 @@ const mongoClient = require('mongodb').MongoClient,
     bodyParser = require('body-parser'),
     express = require('express'),
     multer = require('multer'),
-    getPodcast = require('./PodcastGenerator'),
+    CreatePodcast = require('./PodcastGenerator'),
     path = require('path'),
     fs = require('fs');
 
@@ -50,7 +50,7 @@ mongoClient.connect(
 
         // ADD NEW FEED
         app.post('/api/feed/add', uploadImage, (req, res) => {
-            let podcast = getPodcast(req);
+            let podcast = CreatePodcast(req);
 
             feeds.insertOne(podcast, err => {
                 if (err) res.send(err);
