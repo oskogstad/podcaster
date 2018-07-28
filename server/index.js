@@ -11,13 +11,16 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
     app = express(),
     imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
     feedsUri = path.join(__dirname, '/feeds/'), // eslint-disable-line
-    upload = multer({ dest: imagesUri });
+    episodesUri = path.join(__dirname, '/episodes/'), // eslint-disable-line
+    uploadImage = multer({ dest: imagesUri }).single('podcast-image'),
+    uploadEpisode = multer({ dest: episodesUri }).single('podcast-episode');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(upload.single('podcast-image'));
+
 app.use('/images/', express.static(imagesUri));
 app.use('/feeds/', express.static(feedsUri));
+app.use('/episodes/', express.static(episodesUri));
 
 mongoClient.connect(
     config.databaseUri,
@@ -46,13 +49,18 @@ mongoClient.connect(
         });
 
         // ADD NEW FEED
-        app.post('/api/feed/add', (req, res) => {
+        app.post('/api/feed/add', uploadImage, (req, res) => {
             let podcast = getPodcast(req);
 
             feeds.insertOne(podcast, err => {
                 if (err) res.send(err);
                 else res.send(podcast);
             });
+        });
+
+        // ADD NEW EPISODE
+        app.post('/api/episode/add', uploadEpisode, (req, res) => {
+            res.send('ep up');
         });
 
         app.listen(config.port, () =>
