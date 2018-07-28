@@ -4,11 +4,10 @@ const mongoClient = require('mongodb').MongoClient,
     express = require('express'),
     multer = require('multer'),
     CreatePodcast = require('./PodcastGenerator'),
-    path = require('path'),
-    fs = require('fs');
+    Config = require('./Config'),
+    path = require('path');
 
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
-    app = express(),
+const app = express(),
     imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
     feedsUri = path.join(__dirname, '/feeds/'), // eslint-disable-line
     episodesUri = path.join(__dirname, '/episodes/'), // eslint-disable-line
@@ -23,13 +22,13 @@ app.use('/feeds/', express.static(feedsUri));
 app.use('/episodes/', express.static(episodesUri));
 
 mongoClient.connect(
-    config.databaseUri,
+    Config.databaseUri,
     { useNewUrlParser: true },
     (err, db) => {
         if (err) console.log(`Failed connecting to mongoDB:\n${err}`);
 
-        let dBase = db.db(config.databaseName);
-        let feeds = dBase.collection(config.collectionName);
+        let dBase = db.db(Config.databaseName);
+        let feeds = dBase.collection(Config.collectionName);
 
         // GET ALL FEEDS
         app.get('/api/feeds', (req, res) => {
@@ -63,8 +62,8 @@ mongoClient.connect(
             res.send('ep up');
         });
 
-        app.listen(config.port, () =>
-            console.log(`Listening at ${config.port}`)
+        app.listen(Config.port, () =>
+            console.log(`Listening at ${Config.port}`)
         );
     }
 );

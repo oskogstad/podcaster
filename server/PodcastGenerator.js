@@ -1,10 +1,10 @@
-const crypto = require('crypto'),
-    xml2js = require('xml2js'),
+const xml2js = require('xml2js'),
+    Config = require('./Config'),
+    Utils = require('./Utils'),
     fs = require('fs'),
     path = require('path');
 
-const feedDefaults = JSON.parse(fs.readFileSync('feed_defaults.json', 'utf8')),
-    imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
+const imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
     feedsUri = path.join(__dirname, '/feeds/'); // eslint-disable-line
 
 function GetFeedFileName(pid, title) {
@@ -30,23 +30,26 @@ function CreateFeedFile(podcast) {
             let feedFileName = GetFeedFileName(podcast.pid, podcast.title);
             let json = result.rss.channel[0];
 
-            json.link[0] = feedDefaults.link;
-            json.language[0] = feedDefaults.language;
-            json.copyright[0] = feedDefaults.copyright;
-            json.webMaster[0] = feedDefaults.webMaster;
-            json.managingEditor[0] = feedDefaults.managingEditor;
-            json.image[0].title[0] = feedDefaults.image.title;
-            json.image[0].link[0] = feedDefaults.link;
+            json.link[0] = Config.feedDefaults.link;
+            json.language[0] = Config.feedDefaults.language;
+            json.copyright[0] = Config.feedDefaults.copyright;
+            json.webMaster[0] = Config.feedDefaults.webMaster;
+            json.managingEditor[0] = Config.feedDefaults.managingEditor;
+            json.image[0].title[0] = Config.feedDefaults.image.title;
+            json.image[0].link[0] = Config.feedDefaults.link;
             json.image[0].url[0] = podcast.imageUri;
 
             json['itunes:owner'][0]['itunes:name'][0] =
-                feedDefaults['itunes:owner']['itunes:name'];
+                Config.feedDefaults['itunes:owner']['itunes:name'];
             json['itunes:owner'][0]['itunes:email'][0] =
-                feedDefaults['itunes:owner']['itunes:email'];
-            json['itunes:category'][0].$.text = feedDefaults['itunes:category'];
+                Config.feedDefaults['itunes:owner']['itunes:email'];
+            json['itunes:category'][0].$.text =
+                Config.feedDefaults['itunes:category'];
             if (podcast.keywords) json['itunes:keywords'][0] = podcast.keywords;
-            else json['itunes:keywords'][0] = feedDefaults['itunes:keywords'];
-            json['itunes:author'][0] = feedDefaults['itunes:author'];
+            else
+                json['itunes:keywords'][0] =
+                    Config.feedDefaults['itunes:keywords'];
+            json['itunes:author'][0] = Config.feedDefaults['itunes:author'];
 
             json['atom:link'][0].$.href = podcast.feedUri;
             json['itunes:image'][0].$.href = podcast.imageUri;
@@ -80,7 +83,7 @@ function RenameImageFile(podcast, currentFileName) {
 }
 
 function CreatePodcast(req) {
-    let pid = crypto.randomBytes(10).toString('hex');
+    let pid = Utils.GenerateID();
     let now = new Date().toString();
 
     let podcast = {
@@ -91,11 +94,11 @@ function CreatePodcast(req) {
         description: req.body.description,
         subtitle: req.body.subtitle,
         lastBuildDate: now,
-        feedUri: `${feedDefaults.link}feeds/${GetFeedFileName(
+        feedUri: `${Config.feedDefaults.link}feeds/${GetFeedFileName(
             pid,
             req.body.title
         )}`,
-        imageUri: `${feedDefaults.link}images/${pid}.png`
+        imageUri: `${Config.feedDefaults.link}images/${pid}.png`
     };
 
     CreateFeedFile(podcast);
