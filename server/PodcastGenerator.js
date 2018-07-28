@@ -37,14 +37,25 @@ function CreateFeedFile(podcast) {
             json.managingEditor[0] = feedDefaults.managingEditor;
             json.image[0].title[0] = feedDefaults.image.title;
             json.image[0].link[0] = feedDefaults.link;
+            json.image[0].url[0] = podcast.imageUri;
 
             json['itunes:owner'][0]['itunes:name'][0] =
                 feedDefaults['itunes:owner']['itunes:name'];
             json['itunes:owner'][0]['itunes:email'][0] =
                 feedDefaults['itunes:owner']['itunes:email'];
             json['itunes:category'][0].$.text = feedDefaults['itunes:category'];
-            json['itunes:keywords'][0] = feedDefaults['itunes:keywords'];
+            if (podcast.keywords) json['itunes:keywords'][0] = podcast.keywords;
+            else json['itunes:keywords'][0] = feedDefaults['itunes:keywords'];
             json['itunes:author'][0] = feedDefaults['itunes:author'];
+
+            json['atom:link'][0].$.href = podcast.feedUri;
+            json['itunes:image'][0].$.href = podcast.imageUri;
+            json.pubDate[0] = podcast.pubDate;
+            json.title[0] = podcast.title;
+            json.description[0] = podcast.description;
+            json['itunes:summary'][0] = podcast.description;
+            json['itunes:subtitle'][0] = podcast.subtitle;
+            json.lastBuildDate[0] = podcast.lastBuildDate;
 
             result.rss.channel[0] = json;
 
