@@ -49,14 +49,9 @@ mongoClient.connect(
         app.post('/api/feed/add', (req, res) => {
             let podcast = getPodcast(req);
 
-            feeds.insertOne(podcast, (err, item) => {
+            feeds.insertOne(podcast, err => {
                 if (err) res.send(err);
-                else {
-                    let newFeed = {
-                        id: item.insertedId
-                    };
-                    res.send(newFeed);
-                }
+                else res.send(podcast);
             });
         });
 
