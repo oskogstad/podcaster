@@ -10,12 +10,14 @@ const mongoClient = require('mongodb').MongoClient,
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
     app = express(),
     imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
+    feedsUri = path.join(__dirname, '/feeds/'), // eslint-disable-line
     upload = multer({ dest: imagesUri });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(upload.single('podcast-image'));
 app.use('/images/', express.static(imagesUri));
+app.use('/feeds/', express.static(feedsUri));
 
 mongoClient.connect(
     config.databaseUri,
