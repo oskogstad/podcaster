@@ -7,14 +7,15 @@ const feedDefaults = JSON.parse(fs.readFileSync('feed_defaults.json', 'utf8')),
     imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
     feedsUri = path.join(__dirname, '/feeds/'); // eslint-disable-line
 
-function GetFeedFileName(podcast) {
+function GetFeedFileName(pid, title) {
     return (
-        podcast.pid +
+        pid +
         '_' +
-        podcast.name
+        title
             .trim()
             .replace(/[^\w\s]/g, '')
-            .replace(/\s\s+/g, '_') +
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s/g, '_') +
         '.xml'
     );
 }
@@ -26,7 +27,7 @@ function CreateFeedFile(podcast) {
         xml2js.parseString(data, (err, result) => {
             if (err) console.log(`Failed parsing xml feed template:\n${err}`);
 
-            let feedFileName = GetFeedFileName(podcast);
+            let feedFileName = GetFeedFileName(podcast.pid, podcast.title);
             let json = result.rss.channel[0];
 
             json.link[0] = feedDefaults.link;
@@ -69,11 +70,21 @@ function RenameImageFile(podcast, currentFileName) {
 
 function GetPodcast(req) {
     let pid = crypto.randomBytes(10).toString('hex');
+    let now = new Date().toString();
 
     let podcast = {
-        name: req.body.name,
+        title: req.body.title,
         pid: pid,
-        imagesUri: `${feedDefaults.link}images/${pid}.png`
+        keywords: req.body.keywords,
+        pubDate: now,
+        description: req.body.description,
+        subtitle: req.body.subtitle,
+        lastBuildDate: now,
+        feedUri: `${feedDefaults.link}feeds/${GetFeedFileName(
+            pid,
+            req.body.title
+        )}`,
+        imageUri: `${feedDefaults.link}images/${pid}.png`
     };
 
     CreateFeedFile(podcast);
