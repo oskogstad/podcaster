@@ -9,6 +9,9 @@ let Config = {
     localImagesUri: path.join(__dirname, '/images/'), // eslint-disable-line
     localFeedsUri: path.join(__dirname, '/feeds/'), // eslint-disable-line
     localEpisodesUri: path.join(__dirname, '/episodes/'), // eslint-disable-line
+    ImagesUri: `${feedDefaults.link}images/`,
+    FeedsUri: `${feedDefaults.link}feeds/`,
+    EpisodesUri: `${feedDefaults.link}episodes/`
 };
 
 for (var prop in config) Config[prop] = config[prop];
