@@ -27,7 +27,8 @@ mongoClient.connect(
         if (err) console.log(`Failed connecting to mongoDB:\n${err}`);
 
         let dBase = db.db(Config.databaseName);
-        let feeds = dBase.collection(Config.collectionName);
+        let feeds = dBase.collection(Config.feedCollection);
+        let episodes = dBase.collection(Config.episodeCollection);
 
         // GET ALL FEEDS
         app.get('/api/feeds', (req, res) => {
@@ -58,7 +59,34 @@ mongoClient.connect(
 
         // ADD NEW EPISODE
         app.post('/api/episode/add', uploadEpisode, (req, res) => {
-            res.send('ep up');
+            let now = new Date().toString();
+            let eid = Utils.GenerateID();
+
+            Utils.RenameFile(
+                Config.episodesUri,
+                eid,
+                req.file.filename,
+                '.mp3'
+            );
+
+            let episodeUri = `${Config.feedDefaults.link}episodes/${eid}.mp3`;
+
+            let episode = {
+                eid: eid,
+                feedUri: req.body.feedUri,
+                title: req.body.title,
+                summary: req.body.summary,
+                subtitle: req.body.subtitle,
+                category: req.body.category,
+                episodeUri: episodeUri,
+                duration: req.body.duration,
+                pubDate: now
+            };
+
+            episodes.insertOne(episode, err => {
+                if (err) res.send(err);
+                else res.send(episode);
+            });
         });
 
         app.listen(Config.port, () =>
