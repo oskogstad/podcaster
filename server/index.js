@@ -8,17 +8,19 @@ const mongoClient = require('mongodb').MongoClient,
     Utils = require('./Utils');
 
 const app = express(),
-    uploadImage = multer({ dest: Config.imagesUri }).single('podcast-image'),
-    uploadEpisode = multer({ dest: Config.episodesUri }).single(
+    uploadImage = multer({ dest: Config.localImagesUri }).single(
+        'podcast-image'
+    ),
+    uploadEpisode = multer({ dest: Config.localEpisodesUri }).single(
         'podcast-episode'
     );
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/images/', express.static(Config.imagesUri));
-app.use('/feeds/', express.static(Config.feedsUri));
-app.use('/episodes/', express.static(Config.episodesUri));
+app.use('/images/', express.static(Config.localImagesUri));
+app.use('/feeds/', express.static(Config.localFeedsUri));
+app.use('/episodes/', express.static(Config.localEpisodesUri));
 
 mongoClient.connect(
     Config.databaseUri,
@@ -63,7 +65,7 @@ mongoClient.connect(
             let eid = Utils.GenerateID();
 
             Utils.RenameFile(
-                Config.episodesUri,
+                Config.localEpisodesUri,
                 eid,
                 req.file.filename,
                 '.mp3'

@@ -10,7 +10,7 @@ function RenameFile(baseUri, id, currentFileName, fileEnding) {
         `${baseUri}${currentFileName}`,
         `${baseUri}${id}${fileEnding}`,
         err => {
-            if (err) console.log(`Failed changing image filename:\n${err}`);
+            if (err) console.log(`Failed changing filename:\n${err}`);
         }
     );
 }
