@@ -5,21 +5,20 @@ const mongoClient = require('mongodb').MongoClient,
     multer = require('multer'),
     CreatePodcast = require('./PodcastGenerator'),
     Config = require('./Config'),
-    path = require('path');
+    Utils = require('./Utils');
 
 const app = express(),
-    imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
-    feedsUri = path.join(__dirname, '/feeds/'), // eslint-disable-line
-    episodesUri = path.join(__dirname, '/episodes/'), // eslint-disable-line
-    uploadImage = multer({ dest: imagesUri }).single('podcast-image'),
-    uploadEpisode = multer({ dest: episodesUri }).single('podcast-episode');
+    uploadImage = multer({ dest: Config.imagesUri }).single('podcast-image'),
+    uploadEpisode = multer({ dest: Config.episodesUri }).single(
+        'podcast-episode'
+    );
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/images/', express.static(imagesUri));
-app.use('/feeds/', express.static(feedsUri));
-app.use('/episodes/', express.static(episodesUri));
+app.use('/images/', express.static(Config.imagesUri));
+app.use('/feeds/', express.static(Config.feedsUri));
+app.use('/episodes/', express.static(Config.episodesUri));
 
 mongoClient.connect(
     Config.databaseUri,

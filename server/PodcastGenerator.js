@@ -1,11 +1,7 @@
 const xml2js = require('xml2js'),
     Config = require('./Config'),
     Utils = require('./Utils'),
-    fs = require('fs'),
-    path = require('path');
-
-const imagesUri = path.join(__dirname, '/images/'), // eslint-disable-line
-    feedsUri = path.join(__dirname, '/feeds/'); // eslint-disable-line
+    fs = require('fs');
 
 function GetFeedFileName(pid, title) {
     return (
@@ -21,7 +17,7 @@ function GetFeedFileName(pid, title) {
 }
 
 function CreateFeedFile(podcast) {
-    fs.readFile(feedsUri + 'feed_template.xml', 'utf-8', (err, data) => {
+    fs.readFile(Config.feedsUri + 'feed_template.xml', 'utf-8', (err, data) => {
         if (err) console.log(`Failed reading xml feed template:\n${err}`);
 
         xml2js.parseString(data, (err, result) => {
@@ -65,26 +61,23 @@ function CreateFeedFile(podcast) {
             let builder = new xml2js.Builder();
             let xml = builder.buildObject(result);
 
-            fs.writeFile(feedsUri + feedFileName, xml, err => {
+            fs.writeFile(Config.feedsUri + feedFileName, xml, err => {
                 if (err) console.log(`Failed writing new xml file:\n${err}`);
             });
         });
     });
 }
 
-function RenameImageFile(podcast, currentFileName) {
-    fs.rename(
-        `${imagesUri}${currentFileName}`,
-        `${imagesUri}${podcast.pid}.png`,
-        err => {
-            if (err) console.log(`Failed changing image filename:\n${err}`);
-        }
-    );
-}
-
 function CreatePodcast(req) {
     let pid = Utils.GenerateID();
     let now = new Date().toString();
+
+    let feedUri = `${Config.feedDefaults.link}feeds/${GetFeedFileName(
+        pid,
+        req.body.title
+    )}`;
+
+    let imageUri = `${Config.feedDefaults.link}images/${pid}.png`;
 
     let podcast = {
         title: req.body.title,
@@ -94,15 +87,12 @@ function CreatePodcast(req) {
         description: req.body.description,
         subtitle: req.body.subtitle,
         lastBuildDate: now,
-        feedUri: `${Config.feedDefaults.link}feeds/${GetFeedFileName(
-            pid,
-            req.body.title
-        )}`,
-        imageUri: `${Config.feedDefaults.link}images/${pid}.png`
+        feedUri: feedUri,
+        imageUri: imageUri
     };
 
     CreateFeedFile(podcast);
-    RenameImageFile(podcast, req.file.filename);
+    Utils.RenameFile(Config.imagesUri, podcast.pid, req.file.filename, '.png');
 
     return podcast;
 }
