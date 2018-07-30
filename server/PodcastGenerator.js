@@ -50,7 +50,7 @@ function CreateFeedFile(podcast) {
                 else
                     json['itunes:keywords'][0] =
                         Config.feedDefaults['itunes:keywords'];
-                json['itunes:author'][0] = Config.feedDefaults['itunes:author'];
+                json['itunes:author'][0] = podcast.author;
 
                 json['atom:link'][0].$.href = podcast.feedUri;
                 json['itunes:image'][0].$.href = podcast.imageUri;
@@ -95,7 +95,8 @@ function CreatePodcast(req) {
         subtitle: req.body.subtitle,
         lastBuildDate: now,
         feedUri: feedUri,
-        imageUri: imageUri
+        imageUri: imageUri,
+        author: req.body.author
     };
 
     CreateFeedFile(podcast);
