@@ -76,14 +76,95 @@ mongoClient.connect(
             let episode = {
                 eid: eid,
                 feedUri: req.body.feedUri,
+                description: req.body.description,
                 title: req.body.title,
                 summary: req.body.summary,
                 subtitle: req.body.subtitle,
-                category: req.body.category,
                 episodeUri: episodeUri,
                 duration: req.body.duration,
-                pubDate: now
+                pubDate: now,
+                author: req.body.author
             };
+
+            let fs = require('fs');
+            let xml2js = require('xml2js');
+
+            fs.readFile(
+                Config.localFeedsUri + 'item_template.xml',
+                'utf-8',
+                (err, data) => {
+                    if (err)
+                        console.log(
+                            `Failed reading xml item template:\n${err}`
+                        );
+
+                    xml2js.parseString(data, (err, result) => {
+                        if (err)
+                            console.log(
+                                `Failed parsing xml item template:\n${err}`
+                            );
+
+                        let item = result.item;
+
+                        item.title[0] = episode.title;
+                        item.description[0] = episode.description;
+                        item['itunes:summary'][0] = episode.summary;
+                        item['itunes:subtitle'][0] = episode.subtitle;
+                        item.enclosure[0].$.url = episode.episodeUri;
+                        item.guid[0] = episode.episodeUri;
+                        item['itunes:duration'][0] = episode.duration;
+                        item.pubDate[0] = now;
+                        if (episode.author) {
+                            item['itunes:author'] = [];
+                            item['itunes:author'][0] = episode.author;
+                        }
+
+                        let feedFileName = episode.feedUri.substring(
+                            Config.FeedsUri.length
+                        );
+
+                        fs.readFile(
+                            Config.localFeedsUri + feedFileName,
+                            (err, data) => {
+                                if (err)
+                                    console.log(
+                                        `Failed reading podcast xml feed when adding new episode:\n${err}`
+                                    );
+                                xml2js.parseString(data, (err, result) => {
+                                    if (err)
+                                        console.log(
+                                            `Failed paring podcast feed xml when adding new episode:\n${err}`
+                                        );
+                                    let json = result.rss.channel[0];
+
+                                    if (json.item) json.item.unshift(item);
+                                    else {
+                                        json.item = [];
+                                        json.item.push(item);
+                                    }
+                                    json.lastBuildDate[0] = now;
+
+                                    result.rss.channel[0] = json;
+
+                                    let builder = new xml2js.Builder();
+                                    let xml = builder.buildObject(result);
+
+                                    fs.writeFile(
+                                        Config.localFeedsUri + feedFileName,
+                                        xml,
+                                        err => {
+                                            if (err)
+                                                console.log(
+                                                    `Failed writing xml file after adding new episode:\n${err}`
+                                                );
+                                        }
+                                    );
+                                });
+                            }
+                        );
+                    });
+                }
+            );
 
             episodes.insertOne(episode, err => {
                 if (err) res.send(err);
