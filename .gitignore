@@ -1,8 +1,8 @@
 feed_defaults.json
 config.json
-server/episodes/
-server/images/
-server/feeds/
+podcaster/episodes/
+podcaster/images/
+podcaster/feeds/
 
 # Logs
 logs

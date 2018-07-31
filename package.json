@@ -5,12 +5,11 @@
         "eslint": "5.2.0",
         "eslint-config-prettier": "2.9.0",
         "eslint-plugin-prettier": "2.6.2",
-        "husky": "^0.14.3",
         "prettier": "1.13.7"
     },
     "name": "podcaster",
     "version": "1.0.0",
-    "main": "server/index.js",
+    "main": "podcaster/app.js",
     "license": "MIT",
     "dependencies": {
         "body-parser": "^1.18.3",
@@ -21,6 +20,6 @@
         "xml2js": "^0.4.19"
     },
     "scripts": {
-        "server": "nodemon index.js"
+        "start": "nodemon index.js"
     }
 }
