@@ -4,77 +4,69 @@ const xml2js = require('xml2js'),
     fs = require('fs');
 
 function WriteEpisodeToFeed(episode) {
-    fs.readFile(
-        Config.localFeedsUri + 'item_template.xml',
-        'utf-8',
-        (err, data) => {
-            if (err) console.log(`Failed reading xml item template:\n${err}`);
+    fs.readFile(Config.itemTemplateUri, 'utf-8', (err, data) => {
+        if (err) console.log(`Failed reading xml item template:\n${err}`);
 
-            xml2js.parseString(data, (err, result) => {
+        xml2js.parseString(data, (err, result) => {
+            if (err) console.log(`Failed parsing xml item template:\n${err}`);
+
+            let item = result.item;
+
+            item.title[0] = episode.title;
+            item.description[0] = episode.description;
+            item['itunes:summary'][0] = episode.summary;
+            item['itunes:subtitle'][0] = episode.subtitle;
+            item.enclosure[0].$.url = episode.episodeUri;
+            item.guid[0] = episode.episodeUri;
+            item['itunes:duration'][0] = episode.duration;
+            item.pubDate[0] = episode.pubDate;
+            if (episode.author) {
+                item['itunes:author'] = [];
+                item['itunes:author'][0] = episode.author;
+            }
+
+            let feedFileName = episode.feedUri.substring(
+                Config.FeedsUri.length
+            );
+
+            fs.readFile(Config.localFeedsUri + feedFileName, (err, data) => {
                 if (err)
-                    console.log(`Failed parsing xml item template:\n${err}`);
+                    console.log(
+                        `Failed reading podcast xml feed when adding new episode:\n${err}`
+                    );
+                xml2js.parseString(data, (err, result) => {
+                    if (err)
+                        console.log(
+                            `Failed paring podcast feed xml when adding new episode:\n${err}`
+                        );
+                    let json = result.rss.channel[0];
 
-                let item = result.item;
+                    if (json.item) json.item.unshift(item);
+                    else {
+                        json.item = [];
+                        json.item.push(item);
+                    }
+                    json.lastBuildDate[0] = episode.pubDate;
 
-                item.title[0] = episode.title;
-                item.description[0] = episode.description;
-                item['itunes:summary'][0] = episode.summary;
-                item['itunes:subtitle'][0] = episode.subtitle;
-                item.enclosure[0].$.url = episode.episodeUri;
-                item.guid[0] = episode.episodeUri;
-                item['itunes:duration'][0] = episode.duration;
-                item.pubDate[0] = episode.pubDate;
-                if (episode.author) {
-                    item['itunes:author'] = [];
-                    item['itunes:author'][0] = episode.author;
-                }
+                    result.rss.channel[0] = json;
 
-                let feedFileName = episode.feedUri.substring(
-                    Config.FeedsUri.length
-                );
+                    let builder = new xml2js.Builder();
+                    let xml = builder.buildObject(result);
 
-                fs.readFile(
-                    Config.localFeedsUri + feedFileName,
-                    (err, data) => {
-                        if (err)
-                            console.log(
-                                `Failed reading podcast xml feed when adding new episode:\n${err}`
-                            );
-                        xml2js.parseString(data, (err, result) => {
+                    fs.writeFile(
+                        Config.localFeedsUri + feedFileName,
+                        xml,
+                        err => {
                             if (err)
                                 console.log(
-                                    `Failed paring podcast feed xml when adding new episode:\n${err}`
+                                    `Failed writing xml file after adding new episode:\n${err}`
                                 );
-                            let json = result.rss.channel[0];
-
-                            if (json.item) json.item.unshift(item);
-                            else {
-                                json.item = [];
-                                json.item.push(item);
-                            }
-                            json.lastBuildDate[0] = episode.pubDate;
-
-                            result.rss.channel[0] = json;
-
-                            let builder = new xml2js.Builder();
-                            let xml = builder.buildObject(result);
-
-                            fs.writeFile(
-                                Config.localFeedsUri + feedFileName,
-                                xml,
-                                err => {
-                                    if (err)
-                                        console.log(
-                                            `Failed writing xml file after adding new episode:\n${err}`
-                                        );
-                                }
-                            );
-                        });
-                    }
-                );
+                        }
+                    );
+                });
             });
-        }
-    );
+        });
+    });
 }
 
 function CreateEpisode(req) {
