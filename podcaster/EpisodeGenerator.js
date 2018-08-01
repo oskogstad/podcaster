@@ -1,7 +1,8 @@
 const xml2js = require('xml2js'),
     Config = require('./Config'),
     Utils = require('./Utils'),
-    fs = require('fs');
+    fs = require('fs'),
+    Episode = require('./models/episode');
 
 function WriteEpisodeToFeed(episode) {
     fs.readFile(Config.itemTemplateUri, 'utf-8', (err, data) => {
@@ -76,7 +77,7 @@ function CreateEpisode(req) {
     Utils.RenameFile(Config.localEpisodesUri, eid, req.file.filename, '.mp3');
     let episodeUri = `${Config.feedDefaults.link}episodes/${eid}.mp3`;
 
-    let episode = {
+    let episode = new Episode({
         eid: eid,
         feedUri: req.body.feedUri,
         description: req.body.description,
@@ -87,7 +88,7 @@ function CreateEpisode(req) {
         duration: req.body.duration,
         pubDate: now,
         author: req.body.author
-    };
+    });
 
     WriteEpisodeToFeed(episode);
     return episode;

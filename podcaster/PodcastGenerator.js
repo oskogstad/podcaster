@@ -1,6 +1,7 @@
 const xml2js = require('xml2js'),
     Config = require('./Config'),
     Utils = require('./Utils'),
+    Podcast = require('./models/podcast'),
     fs = require('fs');
 
 function GetFeedFileName(pid, title) {
@@ -79,7 +80,7 @@ function CreatePodcast(req) {
 
     let imageUri = `${Config.feedDefaults.link}images/${pid}.png`;
 
-    let podcast = {
+    let podcast = new Podcast({
         title: req.body.title,
         pid: pid,
         keywords: req.body.keywords,
@@ -90,7 +91,7 @@ function CreatePodcast(req) {
         feedUri: feedUri,
         imageUri: imageUri,
         author: req.body.author
-    };
+    });
 
     CreateFeedFile(podcast);
     Utils.RenameFile(

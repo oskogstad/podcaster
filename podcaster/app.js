@@ -1,11 +1,12 @@
-const mongoClient = require('mongodb').MongoClient,
-    objectId = require('mongodb').ObjectID,
+const mongoose = require('mongoose'),
     bodyParser = require('body-parser'),
     express = require('express'),
     multer = require('multer'),
     path = require('path'),
     CreatePodcast = require('./PodcastGenerator'),
     CreateEpisode = require('./EpisodeGenerator'),
+    Podcast = require('./models/podcast'),
+    Episode = require('./models/episode'),
     Config = require('./Config');
 
 const app = express(),
@@ -26,59 +27,52 @@ app.use('/images/', express.static(Config.localImagesUri));
 app.use('/feeds/', express.static(Config.localFeedsUri));
 app.use('/episodes/', express.static(Config.localEpisodesUri));
 
-mongoClient.connect(
+mongoose.connect(
     Config.databaseUri,
     { useNewUrlParser: true },
-    (err, db) => {
+    err => {
         if (err) console.log(`Failed connecting to mongoDB:\n${err}`);
-
-        let dBase = db.db(Config.databaseName);
-        let feeds = dBase.collection(Config.feedCollection);
-        let episodes = dBase.collection(Config.episodeCollection);
-
-        app.get('/', (req, res) => {
-            feeds.find().toArray((err, feeds) => {
-                if (err) res.send(err);
-                else res.render('feeds', { feeds: feeds });
-            });
-        });
-
-        app.get('/podcast/:id', (req, res) => {
-            let id = objectId(req.params.id);
-            feeds.find(id).toArray((err, result) => {
-                if (err) res.send(err);
-                else res.render('podcast', { podcast: result[0] });
-            });
-        });
-
-        app.get('/addfeed', (req, res) => {
-            res.render('addFeed');
-        });
-
-        app.get('/addepisode', (req, res) => {
-            res.render('addEpisode');
-        });
-
-        app.post('/api/feed/add', uploadImage, (req, res) => {
-            let podcast = CreatePodcast(req);
-
-            feeds.insertOne(podcast, err => {
-                if (err) res.send(err);
-                else res.render('podcast', { podcast: podcast });
-            });
-        });
-
-        app.post('/api/episode/add', uploadEpisode, (req, res) => {
-            let episode = CreateEpisode(req);
-
-            episodes.insertOne(episode, err => {
-                if (err) res.send(err);
-                else res.render('episode', { episode: episode });
-            });
-        });
-
-        app.listen(Config.port, () =>
-            console.log(`Listening at ${Config.port}`)
-        );
     }
 );
+
+app.get('/', (req, res) => {
+    Podcast.find({}, (err, podcasts) => {
+        if (err) res.send(err);
+        else res.render('podcasts', { podcasts: podcasts });
+    });
+});
+
+app.get('/podcast/:pid', (req, res) => {
+    Podcast.findOne({ pid: req.params.pid }, (err, podcast) => {
+        if (err) res.send(err);
+        else res.render('podcast', { podcast: podcast });
+    });
+});
+
+app.get('/add-podcast', (req, res) => {
+    res.render('add-podcast');
+});
+
+app.get('/add-episode', (req, res) => {
+    res.render('add-episode');
+});
+
+app.post('/podcast/add', uploadImage, (req, res) => {
+    let podcast = CreatePodcast(req);
+
+    Podcast.create(podcast, (err, result) => {
+        if (err) res.send(err);
+        else res.render('podcast', { podcast: result });
+    });
+});
+
+app.post('/episode/add', uploadEpisode, (req, res) => {
+    let episode = CreateEpisode(req);
+
+    Episode.create(episode, (err, result) => {
+        if (err) res.send(err);
+        else res.render('episode', { episode: result });
+    });
+});
+
+app.listen(Config.port, () => console.log(`Listening at ${Config.port}`));
