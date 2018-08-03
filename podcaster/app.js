@@ -132,11 +132,11 @@ app.get('/podcast/:pid', isLoggedIn, (req, res) => {
 });
 
 app.get('/addpodcast', isLoggedIn, (req, res) => {
-    res.render('add-podcast');
+    res.render('addpodcast');
 });
 
 app.get('/addepisode', isLoggedIn, (req, res) => {
-    res.render('add-episode');
+    res.render('addepisode');
 });
 
 app.post('/addpodcast', isLoggedIn, uploadImage, (req, res) => {

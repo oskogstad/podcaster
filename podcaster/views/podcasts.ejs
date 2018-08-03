@@ -1,2 +1,12 @@
-<h1>hello podcasts</h1>
-<%= JSON.stringify(podcasts, null, 4); %>
+<%- include('header'); -%>
+    <h1>All podcasts</h1>
+    <% for(var i=0; i < podcasts.length; i++) { %>
+        <div style="margin-top: 20px">
+            <div class="row">
+                <%= podcasts[i].title %>
+            </div>
+            <div class="row">
+                <%= podcasts[i].description %>
+            </div>
+        </div>
+        <% } %>
