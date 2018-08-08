@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
     ExpressSession({
-        secret: 'secret',
+        secret: Config.sessionSecret,
         resave: false,
         saveUninitialized: false
     })
@@ -51,11 +51,11 @@ mongoose.connect(
     { useNewUrlParser: true },
     err => {
         if (err) console.log(`Failed connecting to mongoDB:\n${err}`);
-        User.findOne({ username: 'admin' }, (err, admin) => {
+        User.findOne({ username: Config.adminUsername }, (err, admin) => {
             if (admin) return;
             User.register(
-                new User({ username: 'admin', isAdmin: true }),
-                'admin',
+                new User({ username: Config.adminUsername, isAdmin: true }),
+                Config.adminPassword,
                 err => {
                     if (err) console.log(err);
                     else console.log('admin user created');
