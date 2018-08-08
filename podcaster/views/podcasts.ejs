@@ -1,5 +1,16 @@
 <%- include('header'); -%>
     <h1>All podcasts</h1>
+    <style>
+        .hidden {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .visible {
+            opacity: 1;
+            transition: opacity 0.25s ease-in;
+        }
+    </style>
     <% for(var i=0; i < podcasts.length; i++) { %>
         <div class="row" style="margin: 20px">
             <div class="col-md-6">
@@ -10,11 +21,14 @@
                     <%= podcasts[i].description %>
                 </div>
                 
-                <input class="row" style="width: 400px" type="text" id="feed<%= i%>" value="<%= podcasts[i].feedUri %>" />
+                <input class="row" type="text" id="feed<%= i%>" value="<%= podcasts[i].feedUri %>" />
 
-                <button class="copyButton row" data-id="@item.Type"
-                    data-clipboard-action="copy" data-clipboard-target="#feed<%= i%>">Copy feed URL
-                </button>                    
+                <div class="row">
+                    <button class="copyButton" data-id="@item.Type"
+                        data-clipboard-action="copy" data-clipboard-target="#feed<%= i%>">Copy feed URL
+                    </button>
+                    <div id="alertText<%= i%>" class="hidden">Copied!</div>
+                </div>      
             </div>
             
             <div class="col-md-6"> 
@@ -26,14 +40,22 @@
 
         <script src="https://cdn.jsdelivr.net/clipboard.js/1.5.3/clipboard.min.js"></script>
         <script>
-            function foo() {
+            function onLoad() {
                 var clipboard = new Clipboard('.copyButton');
                     clipboard.on('success', function(e) {
-                        console.log(e);
+                        let feedId = e.trigger.attributes["data-clipboard-target"].nodeValue.slice(-1);
+                        let alertDiv = document.getElementById("alertText"+feedId );
+                        
+                        alertDiv.classList.add('visible');
+                        setTimeout(function() {alertDiv.classList.remove('visible');}, 1500);
+                        
                         e.clearSelection();
                     });
+
                     clipboard.on('error', function(e) {
                         console.log(e);
-                    });}
-            window.onload = foo;
+                    });
+                }
+
+            window.onload = onLoad;
         </script>
