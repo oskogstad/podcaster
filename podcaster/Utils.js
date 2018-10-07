@@ -2,7 +2,7 @@ const crypto = require('crypto'),
     fs = require('fs');
 
 function GenerateID() {
-    return crypto.randomBytes(10).toString('hex');
+    return crypto.randomBytes(25).toString('hex');
 }
 
 function RenameFile(baseUri, id, currentFileName, fileEnding) {

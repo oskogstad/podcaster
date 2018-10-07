@@ -6,13 +6,13 @@ const xml2js = require('xml2js'),
 
 function GetFeedFileName(pid, title) {
     return (
-        pid +
-        '_' +
         title
             .trim()
             .replace(/[^\w\s]/g, '')
             .replace(/\s\s+/g, ' ')
             .replace(/\s/g, '_') +
+        '_' +
+        pid +
         '.xml'
     );
 }
@@ -27,13 +27,13 @@ function CreateFeedFile(podcast) {
             let feedFileName = GetFeedFileName(podcast.pid, podcast.title);
             let json = result.rss.channel[0];
 
-            json.link[0] = Config.feedDefaults.link;
+            json.link[0] = Config.feedDefaults.baseURL;
             json.language[0] = Config.feedDefaults.language;
             json.copyright[0] = Config.feedDefaults.copyright;
             json.webMaster[0] = Config.feedDefaults.webMaster;
             json.managingEditor[0] = Config.feedDefaults.managingEditor;
             json.image[0].title[0] = Config.feedDefaults.image.title;
-            json.image[0].link[0] = Config.feedDefaults.link;
+            json.image[0].link[0] = Config.feedDefaults.baseURL;
             json.image[0].url[0] = podcast.imageUri;
 
             json['itunes:owner'][0]['itunes:name'][0] =
@@ -73,12 +73,12 @@ function CreatePodcast(req) {
     let pid = Utils.GenerateID();
     let now = new Date().toString();
 
-    let feedUri = `${Config.feedDefaults.link}feeds/${GetFeedFileName(
+    let feedUri = `${Config.feedDefaults.baseURL}feeds/${GetFeedFileName(
         pid,
         req.body.title
     )}`;
 
-    let imageUri = `${Config.feedDefaults.link}images/${pid}.png`;
+    let imageUri = `${Config.feedDefaults.baseURL}images/${pid}.png`;
 
     let podcast = new Podcast({
         title: req.body.title,

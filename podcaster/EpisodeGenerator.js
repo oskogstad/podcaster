@@ -75,7 +75,7 @@ function CreateEpisode(req) {
     let eid = Utils.GenerateID();
 
     Utils.RenameFile(Config.localEpisodesUri, eid, req.file.filename, '.mp3');
-    let episodeUri = `${Config.feedDefaults.link}episodes/${eid}.mp3`;
+    let episodeUri = `${Config.feedDefaults.baseURL}episodes/${eid}.mp3`;
 
     let episode = new Episode({
         eid: eid,

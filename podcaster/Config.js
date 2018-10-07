@@ -12,9 +12,9 @@ let Config = {
     localImagesUri: localImagesUri,
     localFeedsUri: localFeedsUri,
     localEpisodesUri: localEpisodesUri,
-    ImagesUri: `${feedDefaults.link}images/`,
-    FeedsUri: `${feedDefaults.link}feeds/`,
-    EpisodesUri: `${feedDefaults.link}episodes/`,
+    ImagesUri: `${feedDefaults.baseURL}images/`,
+    FeedsUri: `${feedDefaults.baseURL}feeds/`,
+    EpisodesUri: `${feedDefaults.baseURL}episodes/`,
     feedTemplateUri: localFeedsUri + 'feed_template.xml',
     itemTemplateUri: localFeedsUri + 'item_template.xml'
 };
