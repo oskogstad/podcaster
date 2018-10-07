@@ -45,16 +45,16 @@
             <%= podcasts[i].description %>
         </div>
 
-        <input style="background-color: chartreuse" type="text" id="feed<%= i%>" value="<%= podcasts[i].feedUri %>" />
+        <input style="background-color: chartreuse" type="text" id="feed<%= i%>" value="<%= baseURL + 'feeds/' + podcasts[i].pid + '.xml' %>" />
 
         <div style="background-color: chocolate">
-            <button id="copyButton<%= i %>" class="copyButton" data-clipboard-text="<%= podcasts[i].feedUri %>">Copy
+            <button id="copyButton<%= i %>" class="copyButton" data-clipboard-text="<%= baseURL + 'feeds/' + podcasts[i].pid + '.xml' %>">Copy
                 feed URL
             </button>
             <div id="alertText<%= i %>" class="hidden">Copied to clipboard <i class="em em-gift"></i></div>
         </div>
         <div style="background-color: salmon">
-            <img class="podcastImage" src="<%= podcasts[i].imageUri %>" alt="podcast art">
+            <img class="podcastImage" src="<%= baseURL + 'images/' + podcasts[i].pid + '.png' %>" alt="podcast art">
         </div>
     </div>
     <% } %>

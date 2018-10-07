@@ -4,17 +4,8 @@ const xml2js = require('xml2js'),
     Podcast = require('./models/podcast'),
     fs = require('fs');
 
-function GetFeedFileName(pid, title) {
-    return (
-        title
-            .trim()
-            .replace(/[^\w\s]/g, '')
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s/g, '_') +
-        '_' +
-        pid +
-        '.xml'
-    );
+function GetFeedFileName(pid) {
+    return pid + '.xml';
 }
 
 function CreateFeedFile(podcast) {
@@ -24,7 +15,7 @@ function CreateFeedFile(podcast) {
         xml2js.parseString(data, (err, result) => {
             if (err) console.log(`Failed parsing xml feed template:\n${err}`);
 
-            let feedFileName = GetFeedFileName(podcast.pid, podcast.title);
+            let feedFileName = GetFeedFileName(podcast.pid);
             let json = result.rss.channel[0];
 
             json.link[0] = Config.feedDefaults.baseURL;
@@ -34,7 +25,7 @@ function CreateFeedFile(podcast) {
             json.managingEditor[0] = Config.feedDefaults.managingEditor;
             json.image[0].title[0] = Config.feedDefaults.image.title;
             json.image[0].link[0] = Config.feedDefaults.baseURL;
-            json.image[0].url[0] = podcast.imageUri;
+            json.image[0].url[0] = `${Config.ImagesUri}${podcast.pid}.png`;
 
             json['itunes:owner'][0]['itunes:name'][0] =
                 Config.feedDefaults['itunes:owner']['itunes:name'];
@@ -48,8 +39,12 @@ function CreateFeedFile(podcast) {
                     Config.feedDefaults['itunes:keywords'];
             json['itunes:author'][0] = podcast.author;
 
-            json['atom:link'][0].$.href = podcast.feedUri;
-            json['itunes:image'][0].$.href = podcast.imageUri;
+            json['atom:link'][0].$.href = `${Config.FeedsUri}${GetFeedFileName(
+                podcast.pid
+            )}`;
+            json['itunes:image'][0].$.href = `${Config.ImagesUri}${
+                podcast.pid
+            }.png`;
             json.pubDate[0] = podcast.pubDate;
             json.title[0] = podcast.title;
             json.description[0] = podcast.description;
@@ -73,13 +68,6 @@ function CreatePodcast(req) {
     let pid = Utils.GenerateID();
     let now = new Date().toString();
 
-    let feedUri = `${Config.feedDefaults.baseURL}feeds/${GetFeedFileName(
-        pid,
-        req.body.title
-    )}`;
-
-    let imageUri = `${Config.feedDefaults.baseURL}images/${pid}.png`;
-
     let podcast = new Podcast({
         title: req.body.title,
         pid: pid,
@@ -88,8 +76,6 @@ function CreatePodcast(req) {
         description: req.body.description,
         subtitle: req.body.subtitle,
         lastBuildDate: now,
-        feedUri: feedUri,
-        imageUri: imageUri,
         author: req.body.author
     });
 

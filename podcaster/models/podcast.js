@@ -8,8 +8,6 @@ const PodcastSchema = new mongoose.Schema({
     description: String,
     subtitle: String,
     lastBuildDate: String,
-    feedUri: String,
-    imageUri: String,
     author: String
 });
 

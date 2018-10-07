@@ -17,8 +17,8 @@ function WriteEpisodeToFeed(episode) {
             item.description[0] = episode.description;
             item['itunes:summary'][0] = episode.summary;
             item['itunes:subtitle'][0] = episode.subtitle;
-            item.enclosure[0].$.url = episode.episodeUri;
-            item.guid[0] = episode.episodeUri;
+            item.enclosure[0].$.url = `${Config.EpisodesUri + episode.eid}.mp3`;
+            item.guid[0] = `${Config.EpisodesUri + episode.eid}.mp3`;
             item['itunes:duration'][0] = episode.duration;
             item.pubDate[0] = episode.pubDate;
             if (episode.author) {
@@ -26,9 +26,7 @@ function WriteEpisodeToFeed(episode) {
                 item['itunes:author'][0] = episode.author;
             }
 
-            let feedFileName = episode.feedUri.substring(
-                Config.FeedsUri.length
-            );
+            let feedFileName = episode.pid + '.xml';
 
             fs.readFile(Config.localFeedsUri + feedFileName, (err, data) => {
                 if (err)
@@ -75,16 +73,14 @@ function CreateEpisode(req) {
     let eid = Utils.GenerateID();
 
     Utils.RenameFile(Config.localEpisodesUri, eid, req.file.filename, '.mp3');
-    let episodeUri = `${Config.feedDefaults.baseURL}episodes/${eid}.mp3`;
 
     let episode = new Episode({
         eid: eid,
-        feedUri: req.body.feedUri,
+        pid: req.body.pid,
         description: req.body.description,
         title: req.body.title,
         summary: req.body.summary,
         subtitle: req.body.subtitle,
-        episodeUri: episodeUri,
         duration: req.body.duration,
         pubDate: now,
         author: req.body.author

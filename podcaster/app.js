@@ -98,7 +98,11 @@ app.post(
 app.get('/', isLoggedIn, (req, res) => {
     Podcast.find({}, (err, podcasts) => {
         if (err) res.send(err);
-        else res.render('podcasts', { podcasts: podcasts });
+        else
+            res.render('podcasts', {
+                podcasts: podcasts,
+                baseURL: Config.feedDefaults.baseURL
+            });
     });
 });
 
@@ -131,15 +135,15 @@ app.get('/podcast/:pid', isLoggedIn, (req, res) => {
     });
 });
 
-app.get('/addpodcast', isLoggedIn, (req, res) => {
+app.get('/addpodcast', isAdmin, (req, res) => {
     res.render('addpodcast');
 });
 
-app.get('/addepisode', isLoggedIn, (req, res) => {
+app.get('/addepisode', isAdmin, (req, res) => {
     res.render('addepisode');
 });
 
-app.post('/addpodcast', isLoggedIn, uploadImage, (req, res) => {
+app.post('/addpodcast', isAdmin, uploadImage, (req, res) => {
     let podcast = CreatePodcast(req);
 
     Podcast.create(podcast, (err, result) => {
@@ -148,7 +152,7 @@ app.post('/addpodcast', isLoggedIn, uploadImage, (req, res) => {
     });
 });
 
-app.post('/addepisode', isLoggedIn, uploadEpisode, (req, res) => {
+app.post('/addepisode', isAdmin, uploadEpisode, (req, res) => {
     let episode = CreateEpisode(req);
 
     Episode.create(episode, (err, result) => {
