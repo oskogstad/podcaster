@@ -1,4 +1,7 @@
-<%- include('header'); -%>
+<%- include('header', {
+    isLoggedIn: true,
+    isAdmin: isAdmin
+}); -%>
 <style>
     .hidden {
             opacity: 0;

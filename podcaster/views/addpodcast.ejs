@@ -1,11 +1,14 @@
-<%- include('header'); -%>
-    <h1>Add podcast</h1>
-    <form method="POST" action="/addpodcast" enctype="multipart/form-data">
-        <input class="row" type="text" name="title" placeholder="title" />
-        <input class="row" type="text" name="keywords" placeholder="keywords" />
-        <input class="row" type="text" name="description" placeholder="description" />
-        <input class="row" type="text" name="subtitle" placeholder="subtitle" />
-        <input class="row" type="text" name="author" placeholder="author" />
-        <input class="row" type="file" name="podcast-image" />
-        <button clas="row">Create</button>
-    </form>
+<%- include('header', {
+    isLoggedIn: true,
+    isAdmin: true
+}); -%>
+<h1>Add podcast</h1>
+<form method="POST" action="/addpodcast" enctype="multipart/form-data">
+    <input class="row" type="text" name="title" placeholder="title" />
+    <input class="row" type="text" name="keywords" placeholder="keywords" />
+    <input class="row" type="text" name="description" placeholder="description" />
+    <input class="row" type="text" name="subtitle" placeholder="subtitle" />
+    <input class="row" type="text" name="author" placeholder="author" />
+    <input class="row" type="file" name="podcast-image" />
+    <button clas="row">Create</button>
+</form>

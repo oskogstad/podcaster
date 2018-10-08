@@ -81,6 +81,10 @@ function isLoggedIn(req, res, next) {
 }
 
 app.get('/login', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.redirect('/');
+    }
+
     res.render('login');
 });
 
@@ -89,19 +93,19 @@ app.post(
     passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/login'
-    }),
-    (req, res) => {
-        res.send(req.user.id);
-    }
+    })
 );
 
 app.get('/', isLoggedIn, (req, res) => {
     Podcast.find({}, (err, podcasts) => {
-        if (err) res.send(err);
-        else
+        if (err) {
+            res.send('500');
+            // log
+        } else
             res.render('podcasts', {
                 podcasts: podcasts,
-                baseURL: Config.feedDefaults.baseURL
+                baseURL: Config.feedDefaults.baseURL,
+                isAdmin: req.user.isAdmin
             });
     });
 });
@@ -121,8 +125,8 @@ app.post('/adduser', isAdmin, (req, res) => {
         req.body.password,
         err => {
             if (err) {
-                console.log(err);
-                res.send(err);
+                // log
+                res.send('500');
             } else res.redirect('/');
         }
     );
@@ -130,8 +134,10 @@ app.post('/adduser', isAdmin, (req, res) => {
 
 app.get('/podcast/:pid', isLoggedIn, (req, res) => {
     Podcast.findOne({ pid: req.params.pid }, (err, podcast) => {
-        if (err) res.send(err);
-        else res.render('podcast', { podcast: podcast });
+        if (err) {
+            res.send('404');
+            //log
+        } else res.render('podcast', { podcast: podcast });
     });
 });
 

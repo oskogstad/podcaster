@@ -12,31 +12,43 @@
             text-decoration: none;
         }
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
 </head>
 
 <body>
-    <div class="row around-md">
-        <div class="col-xs-2">
+    <div>
+        <div>
             <a href="/">
-                <div class="box menulink">
+                <div class="menulink">
                     home
                 </div>
             </a>
         </div>
-
-        <div class="col-xs-2">
+        <% if(isAdmin){ %>
+        <div>
             <a href="/addpodcast">
-                <div class="box menulink">
+                <div class="menulink">
                     add podcast
                 </div>
             </a>
         </div>
+        <div>
+            <a href="/addepisode">
+                <div class="menulink">
+                    add episode
+                </div>
+            </a>
+        </div>
+        <% } %>
 
-        <div class="col-xs-2">
+        <% if(isLoggedIn){ %>
+        <div>
             <a href="/logout">
-                <div class="box menulink">
+                <div class="menulink">
                     log out
                 </div>
             </a>
         </div>
+        <% } %>
     </div>

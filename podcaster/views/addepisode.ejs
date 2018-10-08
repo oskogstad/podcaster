@@ -1,2 +1,5 @@
-<%- include('header'); -%>
-    <h1>add episode</h1>
+<%- include('header', {
+    isLoggedIn: true,
+    isAdmin: true
+}); -%>
+<h1>add episode</h1>
