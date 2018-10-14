@@ -3,3 +3,14 @@
     isAdmin: true
 }); -%>
 <h1>add episode</h1>
+<form method="POST" action="/addepisode" enctype="multipart/form-data">
+    <input type="text" name="title" placeholder="title" />
+    <input type="text" name="pid" value="<%= podcast.pid %>" readonly="readonly" />
+    <input type="text" name="subtitle" placeholder="subtitle" />
+    <input type="text" name="description" placeholder="description" />
+    <input type="text" name="summary" placeholder="summary" />
+    <input type="text" name="author" value="<%= podcast.author %>" />
+    <input class="row" type="file" name="podcast-episode" />
+
+    <button>Create</button>
+</form>

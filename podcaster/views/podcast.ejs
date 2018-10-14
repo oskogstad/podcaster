@@ -1,5 +1,5 @@
-<%- include('header'); -%>
-    <h1>
-        podcast
-    </h1>
-    <%= podcast.title %>
+<%- include('header', { isAdmin: isAdmin, isLoggedIn: true}); -%>
+<h1>
+    podcast
+</h1>
+<%= podcast.title %>

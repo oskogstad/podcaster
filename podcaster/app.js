@@ -137,7 +137,7 @@ app.get('/podcast/:pid', isLoggedIn, (req, res) => {
         if (err) {
             res.send('404');
             //log
-        } else res.render('podcast', { podcast: podcast });
+        } else res.render('podcast', { podcast, isAdmin: req.user.isAdmin });
     });
 });
 
@@ -145,16 +145,20 @@ app.get('/addpodcast', isAdmin, (req, res) => {
     res.render('addpodcast');
 });
 
-app.get('/addepisode', isAdmin, (req, res) => {
-    res.render('addepisode');
+app.get('/addepisode/:pid', isAdmin, (req, res) => {
+    Podcast.findOne({ pid: req.params.pid }, (err, podcast) => {
+        if (err) {
+            res.send('404');
+        } else res.render('addepisode', { podcast });
+    });
 });
 
 app.post('/addpodcast', isAdmin, uploadImage, (req, res) => {
     let podcast = CreatePodcast(req);
 
-    Podcast.create(podcast, (err, result) => {
+    Podcast.create(podcast, (err, podcast) => {
         if (err) res.send(err);
-        else res.render('podcast', { podcast: result });
+        else res.render('podcast', { podcast, isAdmin: req.user.isAdmin });
     });
 });
 
@@ -163,7 +167,11 @@ app.post('/addepisode', isAdmin, uploadEpisode, (req, res) => {
 
     Episode.create(episode, (err, result) => {
         if (err) res.send(err);
-        else res.render('episode', { episode: result });
+        else
+            res.render('episode', {
+                episode: result,
+                isAdmin: req.user.isAdmin
+            });
     });
 });
 
