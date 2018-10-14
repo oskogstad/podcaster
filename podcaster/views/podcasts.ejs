@@ -61,9 +61,7 @@
     <input style="background-color: chartreuse" type="text" id="feed<%= i%>" value="<%= baseURL + 'feeds/' + podcasts[i].pid + '.xml' %>" />
 
     <div style="background-color: chocolate">
-        <button id="copyButton<%= i %>" class="copyButton" data-clipboard-text="<%= baseURL + 'feeds/' + podcasts[i].pid + '.xml' %>">Copy
-            feed URL
-        </button>
+        <button onclick="select_all_and_copy(document.getElementById('feed<%= i%>'))">Copy to Clipboard</button>
         <div id="alertText<%= i %>" class="hidden">Copied to clipboard <i class="em em-gift"></i></div>
     </div>
     <div style="background-color: salmon">
@@ -73,25 +71,4 @@
 <% } %>
 </div>
 
-
-<script src="https://cdn.jsdelivr.net/clipboard.js/1.5.3/clipboard.min.js"></script>
-<script>
-    function onLoad() {
-        var clipboard = new Clipboard('.copyButton');
-        clipboard.on('success', function (e) {
-            let feedId = e.trigger.id.replace("copyButton", "");
-            let alertDiv = document.getElementById("alertText" + feedId);
-
-            alertDiv.classList.add('visible');
-            setTimeout(function () { alertDiv.classList.remove('visible'); }, 1500);
-
-            e.clearSelection();
-        });
-
-        clipboard.on('error', function (e) {
-            console.log(e);
-        });
-    }
-
-    window.onload = onLoad;
-</script>
+<script type="text/javascript" src="/js/copy2clipboard.js"></script>

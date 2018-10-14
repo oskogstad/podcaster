@@ -6,12 +6,14 @@ const feedDefaults = JSON.parse(fs.readFileSync('feed_defaults.json', 'utf8'));
 const localImagesUri = path.join(__dirname, '/images/'); // eslint-disable-line
 const localFeedsUri = path.join(__dirname, '/feeds/');// eslint-disable-line
 const localEpisodesUri = path.join(__dirname, '/episodes/'); // eslint-disable-line
+const jsUri = path.join(__dirname, '/js/'); // eslint-disable-line
 
 let Config = {
     feedDefaults: feedDefaults,
     localImagesUri: localImagesUri,
     localFeedsUri: localFeedsUri,
     localEpisodesUri: localEpisodesUri,
+    jsUri: jsUri,
     ImagesUri: `${feedDefaults.baseURL}images/`,
     FeedsUri: `${feedDefaults.baseURL}feeds/`,
     EpisodesUri: `${feedDefaults.baseURL}episodes/`,
