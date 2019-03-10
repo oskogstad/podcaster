@@ -7,13 +7,17 @@ const localImagesUri = path.join(__dirname, '/images/'); // eslint-disable-line
 const localFeedsUri = path.join(__dirname, '/feeds/');// eslint-disable-line
 const localEpisodesUri = path.join(__dirname, '/episodes/'); // eslint-disable-line
 const jsUri = path.join(__dirname, '/js/'); // eslint-disable-line
+const cssUri = path.join(__dirname, '/css/'); // eslint-disable-line
+const fontsUri = path.join(__dirname, '/fonts/'); // eslint-disable-line
 
 let Config = {
-    feedDefaults: feedDefaults,
-    localImagesUri: localImagesUri,
-    localFeedsUri: localFeedsUri,
+    feedDefaults,
+    localImagesUri,
+    localFeedsUri,
     localEpisodesUri: localEpisodesUri,
-    jsUri: jsUri,
+    jsUri,
+    cssUri,
+    fontsUri,
     ImagesUri: `${feedDefaults.baseURL}images/`,
     FeedsUri: `${feedDefaults.baseURL}feeds/`,
     EpisodesUri: `${feedDefaults.baseURL}episodes/`,

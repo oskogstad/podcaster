@@ -45,7 +45,9 @@ passport.deserializeUser(User.deserializeUser());
 app.use('/images/', express.static(Config.localImagesUri));
 app.use('/feeds/', express.static(Config.localFeedsUri));
 app.use('/episodes/', express.static(Config.localEpisodesUri));
+app.use('/css/', express.static(Config.cssUri));
 app.use('/js/', express.static(Config.jsUri));
+app.use('/fonts/', express.static(Config.fontsUri));
 
 mongoose.connect(
     Config.databaseUri,
